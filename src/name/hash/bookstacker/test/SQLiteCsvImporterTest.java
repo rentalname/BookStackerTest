@@ -1,4 +1,4 @@
-package name.hash.bookstacker.test.importer;
+package name.hash.bookstacker.test;
 
 import java.util.ArrayList;
 import java.util.List;
