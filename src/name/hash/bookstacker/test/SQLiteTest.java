@@ -5,7 +5,7 @@ import java.util.List;
 import name.hash.bookstacker.BookStacker.LibraryTable;
 import name.hash.bookstacker.model.Book;
 import name.hash.bookstacker.model.DefaultBook;
-import name.hash.bookstacker.view.BookListDAO;
+import name.hash.bookstacker.view.Librarian;
 import name.hash.bookstacker.view.BookStackDbHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
@@ -39,7 +39,7 @@ public class SQLiteTest extends AndroidTestCase {
 	public void testFindAllBooks() {
 		SQLiteDatabase db = helper.getReadableDatabase();
 		try {
-			BookListDAO dao = new BookListDAO(db);
+			Librarian dao = new Librarian(db);
 			List<Book> books = dao.findAllBooks();
 			assertEquals("ŒŸõŒ”‚ªˆê’v‚·‚é", 3, books.size());
 
@@ -55,7 +55,7 @@ public class SQLiteTest extends AndroidTestCase {
 	public void testInsertBook() {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		try {
-			BookListDAO dao = new BookListDAO(db);
+			Librarian dao = new Librarian(db);
 			DefaultBook book = new DefaultBook();
 			dao.insertBook(book);
 			List<Book> books = dao.findAllBooks();
@@ -73,8 +73,22 @@ public class SQLiteTest extends AndroidTestCase {
 	public void testUpdateBook() {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		try {
-			BookListDAO dao = new BookListDAO(db);
-			dao.updateBook(1, new DefaultBook());
+			Librarian dao = new Librarian(db);
+			DefaultBook book = new DefaultBook();
+			
+			boolean updateBook = dao.updateBook(1, book);
+			
+			List<Book> books = dao.findAllBooks();
+			for (Book book2 : books) {
+				System.out.println(book2.getTitle());
+			}
+			Book updatedBook = books.get(0);
+			assertTrue(updateBook);
+			assertEquals("ŒŸõŒ”‚ªˆê’v‚·‚é", 3, books.size());
+			assertEquals("‘}“ü‚µ‚½–{‚Ìƒ^ƒCƒgƒ‹‚ªˆê’v‚·‚é", book.getTitle(), updatedBook.getTitle());
+			assertEquals("‘}“ü‚µ‚½–{‚Ì’˜Ò‚ªˆê’v‚·‚é", book.getAuthor(), updatedBook.getAuthor());
+			assertEquals("‘}“ü‚µ‚½–{‚ÌŠª”‚ªˆê’v‚·‚é", book.getVol(), updatedBook.getVol());
+			assertEquals("‘}“ü‚µ‚½–{‚Ìo”ÅĞ‚ªˆê’v‚·‚é", book.getPublisher(), updatedBook.getPublisher());
 		} finally {
 			db.close();
 		}
