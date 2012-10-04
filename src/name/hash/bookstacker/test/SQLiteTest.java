@@ -51,7 +51,17 @@ public class SQLiteTest extends AndroidTestCase {
 			db.close();
 		}
 	}
-
+	public void testFindById(){
+		SQLiteDatabase db = helper.getReadableDatabase();
+		try{
+			Librarian dao = new Librarian(db);
+			Book findBook = dao.findById(3);
+			assertEquals("本のタイトルが一致する", "レディー・ジョーカー",findBook.getTitle());
+			assertEquals("本の著者が一致する", "高村薫",findBook.getAuthor());
+		}finally{
+			db.close();
+		}
+	}
 	public void testInsertBook() {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		try {
