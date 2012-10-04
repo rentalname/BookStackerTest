@@ -15,18 +15,28 @@ public class SQLiteTest extends AndroidTestCase {
 	private BookStackDbHelper helper;
 
 	public void setUp() {
-		helper = new BookStackDbHelper(new RenamingDelegatingContext(getContext(), "test_"));
+		helper = new BookStackDbHelper(new RenamingDelegatingContext(
+				getContext(), "test_"));
 		SQLiteDatabase db = helper.getWritableDatabase();
 		try {
-			db.execSQL("insert into " + LibraryTable.getTableName() + "(" + LibraryTable.title.getColumnName()
-					+ ", " + LibraryTable.vol.getColumnName() + ", " + LibraryTable.author.getColumnName() + ", "
-					+ LibraryTable.publisher.getColumnName() + ") values ('骨の袋', 1, 'スティーブン・キング', '新潮社')");
-			db.execSQL("insert into " + LibraryTable.getTableName() + "(" + LibraryTable.title.getColumnName()
-					+ ", " + LibraryTable.vol.getColumnName() + ", " + LibraryTable.author.getColumnName() + ", "
-					+ LibraryTable.publisher.getColumnName() + ") values ('レディー・ジョーカー', 1, '高村薫', '角川')");
-			db.execSQL("insert into " + LibraryTable.getTableName() + "(" + LibraryTable.title.getColumnName()
-					+ ", " + LibraryTable.vol.getColumnName() + ", " + LibraryTable.author.getColumnName() + ", "
-					+ LibraryTable.publisher.getColumnName() + ") values ('カラフル', 1, '森 絵都', '理論社')");
+			db.execSQL("insert into " + LibraryTable.getTableName() + "("
+					+ LibraryTable.title.getColumnName() + ", "
+					+ LibraryTable.vol.getColumnName() + ", "
+					+ LibraryTable.author.getColumnName() + ", "
+					+ LibraryTable.publisher.getColumnName()
+					+ ") values ('骨の袋', 1, 'スティーブン・キング', '新潮社')");
+			db.execSQL("insert into " + LibraryTable.getTableName() + "("
+					+ LibraryTable.title.getColumnName() + ", "
+					+ LibraryTable.vol.getColumnName() + ", "
+					+ LibraryTable.author.getColumnName() + ", "
+					+ LibraryTable.publisher.getColumnName()
+					+ ") values ('レディー・ジョーカー', 1, '高村薫', '角川')");
+			db.execSQL("insert into " + LibraryTable.getTableName() + "("
+					+ LibraryTable.title.getColumnName() + ", "
+					+ LibraryTable.vol.getColumnName() + ", "
+					+ LibraryTable.author.getColumnName() + ", "
+					+ LibraryTable.publisher.getColumnName()
+					+ ") values ('カラフル', 1, '森 絵都', '理論社')");
 		} finally {
 			db.close();
 		}
@@ -51,17 +61,19 @@ public class SQLiteTest extends AndroidTestCase {
 			db.close();
 		}
 	}
-	public void testFindById(){
+
+	public void testFindById() {
 		SQLiteDatabase db = helper.getReadableDatabase();
-		try{
+		try {
 			Librarian dao = new Librarian(db);
 			Book findBook = dao.findById(3);
-			assertEquals("本のタイトルが一致する", "レディー・ジョーカー",findBook.getTitle());
-			assertEquals("本の著者が一致する", "高村薫",findBook.getAuthor());
-		}finally{
+			assertEquals("本のタイトルが一致する", "カラフル", findBook.getTitle());
+			assertEquals("本の著者が一致する", "森 絵都", findBook.getAuthor());
+		} finally {
 			db.close();
 		}
 	}
+
 	public void testInsertBook() {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		try {
@@ -71,10 +83,13 @@ public class SQLiteTest extends AndroidTestCase {
 			List<Book> books = dao.findAllBooks();
 			Book insertBook = books.get(3);
 			assertEquals("検索件数が一致する", 4, books.size());
-			assertEquals("挿入した本のタイトルが一致する", book.getTitle(), insertBook.getTitle());
-			assertEquals("挿入した本の著者が一致する", book.getAuthor(), insertBook.getAuthor());
+			assertEquals("挿入した本のタイトルが一致する", book.getTitle(),
+					insertBook.getTitle());
+			assertEquals("挿入した本の著者が一致する", book.getAuthor(),
+					insertBook.getAuthor());
 			assertEquals("挿入した本の巻数が一致する", book.getVol(), insertBook.getVol());
-			assertEquals("挿入した本の出版社が一致する", book.getPublisher(), insertBook.getPublisher());
+			assertEquals("挿入した本の出版社が一致する", book.getPublisher(),
+					insertBook.getPublisher());
 		} finally {
 			db.close();
 		}
@@ -85,9 +100,9 @@ public class SQLiteTest extends AndroidTestCase {
 		try {
 			Librarian dao = new Librarian(db);
 			DefaultBook book = new DefaultBook();
-			
+
 			boolean updateBook = dao.updateBook(1, book);
-			
+
 			List<Book> books = dao.findAllBooks();
 			for (Book book2 : books) {
 				System.out.println(book2.getTitle());
@@ -95,10 +110,33 @@ public class SQLiteTest extends AndroidTestCase {
 			Book updatedBook = books.get(0);
 			assertTrue(updateBook);
 			assertEquals("検索件数が一致する", 3, books.size());
-			assertEquals("挿入した本のタイトルが一致する", book.getTitle(), updatedBook.getTitle());
-			assertEquals("挿入した本の著者が一致する", book.getAuthor(), updatedBook.getAuthor());
+			assertEquals("挿入した本のタイトルが一致する", book.getTitle(),
+					updatedBook.getTitle());
+			assertEquals("挿入した本の著者が一致する", book.getAuthor(),
+					updatedBook.getAuthor());
 			assertEquals("挿入した本の巻数が一致する", book.getVol(), updatedBook.getVol());
-			assertEquals("挿入した本の出版社が一致する", book.getPublisher(), updatedBook.getPublisher());
+			assertEquals("挿入した本の出版社が一致する", book.getPublisher(),
+					updatedBook.getPublisher());
+		} finally {
+			db.close();
+		}
+	}
+
+	public void testBookDelete() {
+		SQLiteDatabase db = helper.getWritableDatabase();
+		try {
+			Librarian dao = new Librarian(db);
+			dao.deleteBook(1);
+
+			List<Book> books = dao.findAllBooks();
+			Book firstBook = books.get(0);
+			Book secondBook = books.get(1);
+
+			assertEquals("取得件数が一致する", 2, books.size());
+
+			assertEquals("最初の本のタイトルが一致する", "レディー・ジョーカー", firstBook.getTitle());
+			assertEquals("2番目の本の著者が一致する", "森 絵都", secondBook.getAuthor());
+			assertEquals("2番目の本のIDが変化していない", 3, secondBook.getId());
 		} finally {
 			db.close();
 		}
